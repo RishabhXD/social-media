@@ -11,6 +11,12 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
+import { registerController } from "./controller/auth.js";
+import authRoutes from "./routes/auth.js";
+import { userRoutes } from "./routes/user.js";
+import { postRoutes } from "./routes/post.js";
+import { verifyToken } from "./middleware/auth.js";
+import { createPost } from "./controller/post.js";
 
 // Configs
 const __filename = fileURLToPath(import.meta.url);
@@ -40,6 +46,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Routes
+app.post("/auth/register", upload.single("picture"), registerController);
+app.post("/post", verifyToken, upload.single("picture"), createPost);
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/post", postRoutes);
 // DB Connection
 connectDB();
 
